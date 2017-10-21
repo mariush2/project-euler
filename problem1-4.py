@@ -50,6 +50,31 @@ def largest_prime_factor(find):
                     break
 
 
+def palindrome(num):
+    reversed = int(str(num)[::-1])
+    return reversed == num
+
+
+def set_to_highest(n):
+    return 10 ** n - 1
+
+def set_to_lowest(n):
+    return 10 ** (n-1)
+
+
+def largest_palindrome_product(n):
+    #n is amount of digits
+    min = set_to_lowest(n)
+    max = set_to_highest(n)
+
+    biggest = 0
+    for a in range(min, max + 1):
+        for b in range(a + 1, max + 1):
+            product = a*b
+            if product > biggest and palindrome(product):
+                biggest = product
+    return biggest
+
 #Problem 1
 #find_sum_of_multi(1000)
 #
@@ -60,3 +85,4 @@ def largest_prime_factor(find):
 #largest_prime_factor(600851475143)
 #
 #Problem 4
+largest_palindrome_product(n)
