@@ -58,6 +58,7 @@ def palindrome(num):
 def set_to_highest(n):
     return 10 ** n - 1
 
+
 def set_to_lowest(n):
     return 10 ** (n-1)
 
@@ -73,6 +74,7 @@ def largest_palindrome_product(n):
             product = a*b
             if product > biggest and palindrome(product):
                 biggest = product
+
     return biggest
 
 
@@ -83,13 +85,12 @@ def smallest_multiple(min, max):
     divisible = False
     num = 0
     while not(divisible):
-        num += 10
+        num += max
         divisible = True
-        for i in range(min, max + 1):
+        for i in range(min + 1, max + 1):
             if(num % i != 0):
                 divisible = False
                 break
-
 
     return num
 
@@ -108,4 +109,4 @@ def smallest_multiple(min, max):
 #largest_palindrome_product(3)
 #
 #Problem 5
-smallest_multiple(1,20)
+#smallest_multiple(1,20)
