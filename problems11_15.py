@@ -181,7 +181,6 @@ def split_digits():
 
 
         newGrid.append(line)
-    print(newGrid)
 
 #Problem 11
 #largest_product_grid()
