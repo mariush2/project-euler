@@ -152,6 +152,14 @@ def check_century():
     return total
 
 
+#Problem 20
+def sum_of_factorial(num):
+    full = str(factorial(num))
+    sum = 0
+    for i in range(len(full)):
+        sum += int(full[i])
+    return sum
+
 #Problem 16
 #power_digit_sum(1000)
 #
@@ -164,3 +172,6 @@ def check_century():
 #
 #Problem 19
 #check_century()
+#
+#Problem 20
+sum_of_factorial(100)
