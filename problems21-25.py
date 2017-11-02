@@ -63,13 +63,6 @@ def check_abuntant(num):
 def check_sum(list, num):
     if(num < 24):
         return False
-    else:
-        for x in list:
-            for y in list:
-                if(x + y == num):
-                    return False
-        else:
-            return True
 
 
 def non_abuntant_sum():
@@ -77,17 +70,26 @@ def non_abuntant_sum():
     sum = 0
     abuntant = []
     full = range(1, 28123)
-    for num in islice(full[:len(full) / 2], 1, None):
-        #Go from that number and down, check if abuntant numbers are equal to it
+    i = 2
+    for num in islice(full, 1, None):
+        #Find abuntant numbers we can use
         if(check_abuntant(num)):
             abuntant.append(num)
 
-    for num in islice(full, 1, None):
-        if(check_sum(abuntant[:num-12], num)):
-            sum += num
+    can = []
+    for new in range(0, 28124):
+        can.append(False)
+    for i in range(0, len(abuntant)):
+        for j in range(i, len(abuntant)):
+            if(abuntant[i] + abuntant[j] <= 28123):
+                can[abuntant[i] + abuntant[j]] = True
+            else:
+                break
 
+    for i in full:
+        if(not(can[i])):
+            sum += i
     return sum
-
 
 #Problem 21
 #amicable(10000)
@@ -96,4 +98,6 @@ def non_abuntant_sum():
 #total_score(names)
 #
 #Problem 23
-non_abuntant_sum()
+#non_abuntant_sum()
+#
+#Problem 24
