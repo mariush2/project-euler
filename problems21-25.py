@@ -1,6 +1,7 @@
 from math import *
 import string
 from itertools import *
+from decimal import *
 
 
 #problem 21
@@ -101,6 +102,17 @@ def lexiograph(nums, n):
 
     return "".join([x for x in list(permutations(nums))[n-1]])
 
+#Problem 25
+def digits_in_fib(n):
+    phi = (1 + sqrt(5)) / 2
+    return int(n*log10(phi) - (log10(5)) / 2) + 1
+
+def digit_fib(n):
+    i = 1
+    while digits_in_fib(i) < n:
+        i += 1
+    return i
+
 #Problem 21
 #amicable(10000)
 #
@@ -111,4 +123,7 @@ def lexiograph(nums, n):
 #non_abuntant_sum()
 #
 #Problem 24
-lexiograph("0123456789", 1000000)
+#lexiograph("0123456789", 1000000)
+#
+#Problem 25
+digit_fib(1000)
