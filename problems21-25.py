@@ -91,6 +91,16 @@ def non_abuntant_sum():
             sum += i
     return sum
 
+
+#Problem 24
+def lexiograph(nums, n):
+    #Check if nums are sorted when coming in
+    for i in range(0, len(nums)-1):
+        if(nums[i] > nums[i + 1]):
+            return "You entered something wrong!"
+
+    return "".join([x for x in list(permutations(nums))[n-1]])
+
 #Problem 21
 #amicable(10000)
 #
@@ -101,3 +111,4 @@ def non_abuntant_sum():
 #non_abuntant_sum()
 #
 #Problem 24
+lexiograph("0123456789", 1000000)
