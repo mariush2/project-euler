@@ -174,4 +174,4 @@ def sum_of_factorial(num):
 #check_century()
 #
 #Problem 20
-sum_of_factorial(100)
+#sum_of_factorial(100)
