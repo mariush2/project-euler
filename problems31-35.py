@@ -1,4 +1,5 @@
 from math import *
+from itertools import *
 
 #Problem 31
 coins = [200,100,50,20,10,5,2,1]
@@ -62,9 +63,66 @@ def find_pandigital_products():
 
 
 #Problem 33
+def find_fractions():
+    full = []
+    for a in range(10,98):
+        for b in range(a+1,99):
+            if(not set(str(a)).isdisjoint(str(b)) and (str(a)[1] != "0" and str(b)[1] != "0")):
+                if(check_cancelling_fraction(a, b)):
+                    full.append([a,b])
+
+    upper = 1
+    lower = 1
+    for fraction in full:
+        upper *= fraction[0]
+        lower *= fraction[1]
+
+    return lcd(upper, lower), upper, lower
+
+
+def check_cancelling_fraction(a, b):
+    actual = a/b
+    #New values
+    if(str(a)[0] in str(b)):
+        common = str(a)[0]
+        a = int(str(a)[1])
+    else:
+        common = str(a)[1]
+        a = int(str(a)[0])
+
+    if(common == str(b)[0]):
+        b = int(str(b)[1])
+    else:
+        b = int(str(b)[0])
+
+    new = a/b
+    if(actual == new):
+        #Not trivial
+        return True
+    return False
+
+
+def isPrime(n):
+    return n > 1 and all(n%i for i in islice(count(2), int(sqrt(n)-1)))
+
+
+def lcd(a, b):
+    num = int(sqrt(b))
+    while(not(isPrime(a) and isPrime(b)) and num > 1):
+        if(a % num == 0 and b % num == 0):
+            a /= num
+            b /= num
+        else:
+            num -= 1
+    return a,b
+
 
 #Problem  31
 #count_comb(200, 0, [], None)
 #
 #Problem 32
 #find_pandigital_products()
+#
+#Problem 33
+#Run in python 3!
+#print(find_fractions())
