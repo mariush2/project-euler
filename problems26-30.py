@@ -116,7 +116,7 @@ def digit_nth_powers(n):
 #generate_spiral(1001)
 #
 #Problem 29
-#distinct_powers(2,100)
+distinct_powers(2,100)
 #
 #Problem 30
-digit_nth_powers(5)
+#digit_nth_powers(5)

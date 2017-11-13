@@ -20,13 +20,7 @@ def count_comb(left, i, comb, add):
 
 #Problem 32
 def pandigital(num):
-    return len(set(str(num))) == len(str(num))
-
-
-def next_pandigital(num):
-    while not(pandigital(num)):
-        num -= 1
-    return num
+    return (len(set(str(num))) == len(str(num)) and "0" not in set(str(num)))
 
 
 def different_numbers(x, y):
@@ -36,33 +30,41 @@ def different_numbers(x, y):
     return set(x).isdisjoint(y)
 
 
-def pandigital_product(x, y):
-    if(different_numbers(x, y)):
-        #Continue finding product
-        product = x*y
+def pandigital_product(x, y, product):
+    if(different_numbers(x, y) and pandigital(product) and pandigital(x) and pandigital(y)):
         if(different_numbers(product, x) and different_numbers(product, y)):
             return True
         else:
             return False
     return False
 
-def find_pandigital_products(upper):
+
+def full_pandigital(x, y, product):
+    full = list(str(x) + str(y) + str(product))
+    return len(set(full)) == 9
+
+
+def find_pandigital_products():
     found = []
-    y = upper
-    while(y > 1):
-        for x in range(2, y):
-            if(pandigital(x)):
-                if(different_numbers(x,y)):
-                    product = x*y
-                    if(pandigital_product(x, y) and product not in found):
-                       found.append(product)
-        y = next_pandigital(y-1)
+    for m in range(2, 9876):
+        if(m > 9):
+            nbegin = 123
+        else:
+            nbegin = 1234
+        for n in range(nbegin, 9876-m):
+            product = n*m
+            if(pandigital_product(m, n, product) and product not in found and full_pandigital(m, n, product)):
+                print(m,"*",n,"=",product)
+                found.append(product)
+
+    print(found)
     return sum(found)
 
+
+#Problem 33
 
 #Problem  31
 #count_comb(200, 0, [], None)
 #
 #Problem 32
-#Not done!
-print(find_pandigital_products(123456789))
+#find_pandigital_products()
