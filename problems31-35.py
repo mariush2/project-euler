@@ -1,5 +1,6 @@
 from math import *
 from itertools import *
+from itertools import *
 
 #Problem 31
 coins = [200,100,50,20,10,5,2,1]
@@ -140,8 +141,28 @@ def find_curios_numbers():
 
 
 #Problem 35
+def circular_prime(num):
+    if(isPrime(num)):
+        num = str(num)
+        old_len = len(num)
+
+        for digit in num[0:len(num)-1]:
+            num += digit
+
+        for i in range(len(num) - old_len + 1):
+            new = int(num[i:i+old_len])
+            if(not isPrime(new)):
+                return False
+        return True
+    return False
 
 
+def circular_primes_under(upper):
+    circular_primes = []
+    for num in range(upper):
+        if(circular_prime(num)):
+            circular_primes.append(num)
+    return len(circular_primes)
 
 #Problem  31
 #count_comb(200, 0, [], None)
@@ -157,3 +178,4 @@ def find_curios_numbers():
 #find_curios_numbers()
 #
 #Problem 35
+circular_primes_under(1000000)
