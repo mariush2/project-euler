@@ -117,6 +117,32 @@ def lcd(a, b):
     return a,b
 
 
+#Problem 34
+def same_as_factorial_sum(num):
+    if(num <= 2):
+        return False
+    old = num
+    num = str(num)
+    sum = 0
+    for digit in num:
+        sum += factorial(int(digit))
+
+    return sum == old
+
+
+def find_curios_numbers():
+    found = []
+    for i in range(50000):
+        if(same_as_factorial_sum(i)):
+            found.append(i)
+
+    return sum(found)
+
+
+#Problem 35
+
+
+
 #Problem  31
 #count_comb(200, 0, [], None)
 #
@@ -126,3 +152,8 @@ def lcd(a, b):
 #Problem 33
 #Run in python 3!
 #print(find_fractions())
+#
+#Problem 34
+#find_curios_numbers()
+#
+#Problem 35
