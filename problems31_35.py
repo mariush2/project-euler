@@ -1,6 +1,5 @@
 from math import *
 from itertools import *
-from itertools import *
 
 #Problem 31
 coins = [200,100,50,20,10,5,2,1]
