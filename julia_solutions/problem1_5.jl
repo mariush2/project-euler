@@ -44,7 +44,7 @@ end
 #Problem 3
 
 function is_prime(n)
-    if n <= 1
+    if n < 1
         return false
     elseif n <= 3
         return true
@@ -61,38 +61,29 @@ function is_prime(n)
     return true
 end
 
-function next_prime(n)
-    i = n + 1
+#print(next_prime(11))
+
+function prime_factor(n)
+    factors = []
     while true
-       if is_prime(i)
-           return i
-       end
-       i += 1
-   end
-   return nothing
-end
-
-
-
-
-function largest_prime_factor(n)
-    if !(is_prime(n))
-        i = 1
-        largest = i
-        while  i < n
-            if n % i == 0
-                largest = i
-            else
-                i = next_prime(i)
+        if is_prime(n)
+            #Cant split the number more, must be prime
+            if n != 1
+                push!(factors, n)
+            end
+            return factors
+        else
+            for i = 2:ceil(√n)
+                if is_prime(i) && n % i == 0
+                    n /= i
+                    push!(factors, i)
+                end
             end
         end
-        return largest
     end
-    return nothing
 end
 
-print(largest_prime_factor(13195))
-
+#print(prime_factor(600851475143))
 
 #TODO
 #Put this answer to 40_45 file
@@ -103,6 +94,7 @@ function is_pentagonal(n)
     penTest = (sqrt(1 + 24 * n) + 1.0) / 6.0
     return penTest == floor(penTest)
 end
+
 function problem_44()
     print("Running problem 44...\n")
     result = 0
@@ -127,4 +119,4 @@ function problem_44()
     return result, runs
 end
 
-#print(problem_44())
+print(problem_44())
