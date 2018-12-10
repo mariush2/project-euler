@@ -28,4 +28,32 @@ function problem_44()
     return "Gave: " * string(result) * ", ran " * string(runs) * " times"
 end
 
-print(problem_44())
+#print(problem_44())
+
+# Problem 45
+function is_hexagonal(n)
+    hexTest = (1 + sqrt(1 + 8*n)) / 4
+    return hexTest == floor(hexTest)
+end
+
+function triangle_num(n)
+    return (n * (n + 1)) / 2
+end
+
+function problem45()
+    println("Running problem 45...")
+    n = 286
+    tri = 0
+    notFound = true
+    while notFound
+        tri = triangle_num(n)
+        if is_hexagonal(tri) && is_pentagonal(tri)
+            break;
+        else
+            n = n + 1
+        end
+    end
+    return string("Found: ", tri)
+end
+
+print(problem45(), "\n")
