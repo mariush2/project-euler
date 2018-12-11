@@ -4,6 +4,7 @@ function is_pentagonal(n)
     penTest = (sqrt(1 + 24 * n) + 1.0) / 6.0
     return penTest == floor(penTest)
 end
+
 function problem_44()
     print("Running problem 44...\n")
     result = 0
@@ -28,7 +29,7 @@ function problem_44()
     return "Gave: " * string(result) * ", ran " * string(runs) * " times"
 end
 
-#print(problem_44())
+#println(problem_44())
 
 # Problem 45
 function is_hexagonal(n)
@@ -56,4 +57,4 @@ function problem45()
     return string("Found: ", tri)
 end
 
-print(problem45(), "\n")
+#println(problem45())
