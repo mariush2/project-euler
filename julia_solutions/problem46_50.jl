@@ -42,24 +42,24 @@ function convertfactorlist!(list)
     list = new
 end
 
-function problem47()
-    num = 647
+function problem47(n)
+    num = 1
     used = []
     notFound = true
     while notFound
         factors = convertfactorlist!(collect(factor(num)))
         used = []
-        if length(factors) == 4
+        if length(factors) == n
             addfactors!(used, factors)
-            for i = num+1:num+3
+            for i = num+1:num+n-1
                 factors = convertfactorlist!(collect(factor(i)))
                 common = intersect(factors, used)
-                if length(factors) != 4 || length(common) != 0
+                if length(factors) != n || length(common) != 0
                     break
                 else
                     addfactors!(used, factors)
                 end
-                if length(used) == 16
+                if length(used) == n * n
                     notFound = false
                 end
             end
@@ -71,4 +71,4 @@ function problem47()
     end
 end
 
-println(problem47())
+#println(@time problem47(4))
