@@ -1,4 +1,4 @@
-using Primes
+#using Primes
 # Problem 46
 function istwicesquare(number)
     squareTest = sqrt(number/2)
@@ -72,3 +72,10 @@ function problem47(n)
 end
 
 #println(@time problem47(4))
+
+#Problem 48
+function problem48()
+    return string(sum([i^i for i in 1:big(1000)]))[end-9:end]
+end
+
+println(@time problem48())
