@@ -96,24 +96,12 @@ end
 function checkdiff!(A)
     sort!(A)
     for i = 1:length(A)
-        for j = i:length(A)
-            if i != j
-                diff = abs(A[j] - A[i])
-            else
-                diff = Inf
+        for j = i + 1:length(A)
+            diff = abs(A[j] - A[i])
+            if (A[j] + diff) in A
+                #Found the third prime
+                return [A[i], A[j], A[j] + diff]
             end
-            if A[j] > A[i]
-                if (A[j] + diff) in A
-                    #Found the third prime
-                    return [A[i], A[j], A[j] + diff]
-                end
-            elseif A[i] > A[j]
-                if (A[i] + diff) in A
-                    #Found the third prime
-                    return [A[j], A[i], A[i] + diff]
-                end
-            end
-
         end
     end
     return []
