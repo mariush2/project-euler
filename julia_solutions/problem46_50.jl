@@ -1,4 +1,4 @@
-#using Primes
+using Primes
 # Problem 46
 function istwicesquare(number)
     squareTest = sqrt(number/2)
