@@ -156,4 +156,4 @@ function problem50(upper)
     return prime
 end
 
-println(problem50(1000000))
+println(problem50(100000))
