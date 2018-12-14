@@ -135,18 +135,20 @@ end
 function problem50(upper)
     all = primes(upper)
     prime_sums = collect(1:length(all) + 1)
-    len = -1
+    len = 1
     prime = -1
     fill!(prime_sums, 0)
     prime_sums[1] = 0
     for i = 2:length(prime_sums)
         prime_sums[i] = prime_sums[i - 1] + all[i - 1]
     end
-    for i = 1:length(prime_sums)
-        for j = i + 1:length(prime_sums)
-            current = prime_sums[j] - prime_sums[i]
-            if current in all && j - i > len
-                len = j - i
+    for i = len:length(prime_sums)
+        for j = i - (len + 1):-1:1
+            current = prime_sums[i] - prime_sums[j]
+            if current > upper
+                break
+            elseif current in all
+                len = i - j
                 prime = current
             end
         end
