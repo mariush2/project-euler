@@ -131,29 +131,27 @@ end
 
 #println(@time problem49())
 
+#Problem 50
 function problem50(upper)
     all = primes(upper)
-    sums = [[0, 0] for x in all, y in all]
-    prime = 0
-    largest_len = 0
-    for i = 1:length(all)
-        for j = 1:length(all)
-            #sums[col, row]
-            sums[j, i][1] = sum(all[i:j])
-            sums[j, i][2] = j - i
-        end
+    prime_sums = collect(1:length(all) + 1)
+    len = -1
+    prime = -1
+    fill!(prime_sums, 0)
+    prime_sums[1] = 0
+    for i = 2:length(prime_sums)
+        prime_sums[i] = prime_sums[i - 1] + all[i - 1]
     end
-    for i = 1:length(all)
-        for j = 1:length(all)
-            num = sums[i, j][1]
-            len = sums[i, j][2]
-            if isprime(num) && num < upper && len > largest_len
-                prime = num
-                largest_len = len
+    for i = 1:length(prime_sums)
+        for j = i + 1:length(prime_sums)
+            current = prime_sums[j] - prime_sums[i]
+            if current in all && j - i > len
+                len = j - i
+                prime = current
             end
         end
     end
     return prime
 end
 
-println(problem50(100000))
+println(@time problem50(10^6))
