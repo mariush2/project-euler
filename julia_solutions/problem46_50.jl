@@ -129,4 +129,31 @@ function problem49()
     return "Not found"
 end
 
-println(@time problem49())
+#println(@time problem49())
+
+function problem50(upper)
+    all = primes(upper)
+    sums = [[0, 0] for x in all, y in all]
+    prime = 0
+    largest_len = 0
+    for i = 1:length(all)
+        for j = 1:length(all)
+            #sums[col, row]
+            sums[j, i][1] = sum(all[i:j])
+            sums[j, i][2] = j - i
+        end
+    end
+    for i = 1:length(all)
+        for j = 1:length(all)
+            num = sums[i, j][1]
+            len = sums[i, j][2]
+            if isprime(num) && num < upper && len > largest_len
+                prime = num
+                largest_len = len
+            end
+        end
+    end
+    return prime
+end
+
+println(problem50(1000000))
