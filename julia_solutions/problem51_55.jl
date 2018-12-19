@@ -15,6 +15,53 @@ number (not necessarily adjacent digits) with the same digit, is part of an eigh
 
 
 =#
-function problem51()
+function permutationprime(prime, r)
+    # This function checks if two of the digits in the prime, (any two positions!)
+    # can be replaced with the "replace" number and still be a prime
+    prime, r = string(prime), string(r)
 
+    for first = 1:length(prime)
+        for second = first + 1:length(prime)
+            if parse(Int64, prime[first]) != parse(Int64, r) && parse(Int64, prime[second]) != parse(Int64, r)
+                front = prime[1:first - 1]
+                middle = prime[first + 1:second - 1]
+                back = prime[second + 1:end]
+                test = front * r * middle * r * back
+                test = parse(Int64, test)
+                if isprime(test)
+                    return true
+                end
+            else
+                continue
+            end
+        end
+    end
+    return false
 end
+
+function findnextprime(current)
+    current = current + 2
+    while !isprime(current)
+        current = current + 2
+    end
+    return current
+end
+
+function problem51()
+    current = 997
+    while true
+        current_amount = 1
+        for i = 0:9
+            if permutationprime(current, i)
+                current_amount = current_amount + 1
+            end
+        end
+        if current_amount == 8
+            return current
+        else
+            current = findnextprime(current)
+        end
+    end
+end
+
+println(problem51())
