@@ -92,10 +92,10 @@ def c_n_length(n):
     while len(c) <= n + 1:
         if(current < 10):
             if(passed):
-                for i in xrange(10):
+                for i in range(10):
                     c += full[i] + full[current]
             else:
-                for i in xrange(10):
+                for i in range(10):
                     c += full[current] + full[i]
             current += 1
         else:
@@ -107,7 +107,7 @@ def c_n_length(n):
 def problem_40(upper):
     product = 1
     c = c_n_length(10 ** upper)
-    for i in xrange(upper):
+    for i in range(upper):
         cur = d_n(10 ** i, c)
         product *= cur
     return product
@@ -126,4 +126,5 @@ def problem_40(upper):
 #find_best_p(1000)
 #
 #Problem 40
-problem_40(7)
+print(c_n_length(10 ** 7)[0:500])
+#problem_40(7)
