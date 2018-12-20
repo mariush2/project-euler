@@ -16,24 +16,20 @@ number (not necessarily adjacent digits) with the same digit, is part of an eigh
 
 =#
 function permutationprime(prime, r)
-    # This function checks if two of the digits in the prime, (any two positions!)
+    # This function checks if any of the digits in the prime, (any two positions!)
     # can be replaced with the "replace" number and still be a prime
-    prime, r = string(prime), string(r)
-
-    for first = 1:length(prime)
-        for second = first + 1:length(prime)
-            if parse(Int64, prime[first]) != parse(Int64, r) && parse(Int64, prime[second]) != parse(Int64, r)
-                front = prime[1:first - 1]
-                middle = prime[first + 1:second - 1]
-                back = prime[second + 1:end]
-                test = front * r * middle * r * back
-                test = parse(Int64, test)
-                if isprime(test)
-                    return true
-                end
-            else
-                continue
+    prime = string(prime)
+    for pos = 1:length(prime)
+        if parse(Int64, prime[pos]) != parse(Int64, r) #Check that we for example don't replace 9 at 1 in '997'
+            front = prime[1:pos - 1]
+            back = prime[pos + 1:end]
+            test = front * r * back
+            test = parse(Int64, test)
+            if isprime(test) && length(string(test)) == length(prime)
+                return true
             end
+        else
+            continue
         end
     end
     return false
@@ -51,8 +47,8 @@ function problem51()
     current = 997
     while true
         current_amount = 1
-        for i = 0:9
-            if permutationprime(current, i)
+        for digit in string(current)
+            if permutationprime(current, digit)
                 current_amount = current_amount + 1
             end
         end
