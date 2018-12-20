@@ -26,7 +26,7 @@ function permutationprime(prime, r)
             test = front * r * back
             test = parse(Int64, test)
             if isprime(test) && length(string(test)) == length(prime)
-                return true
+                return true, test
             end
         else
             continue
@@ -47,8 +47,12 @@ function problem51()
     current = 997
     while true
         current_amount = 1
+        used = [current]
         for digit in string(current)
-            if permutationprime(current, digit)
+            test = permutationprime(current, digit)
+            if test[1] && !(test[2] in used)
+                push!(used, test[2])
+                println(used)
                 current_amount = current_amount + 1
             end
         end
