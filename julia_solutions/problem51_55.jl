@@ -15,53 +15,29 @@ number (not necessarily adjacent digits) with the same digit, is part of an eigh
 
 
 =#
-function permutationprime(prime, r)
-    # This function checks if any of the digits in the prime, (any two positions!)
-    # can be replaced with the "replace" number and still be a prime
-    prime = string(prime)
-    for pos = 1:length(prime)
-        if parse(Int64, prime[pos]) != parse(Int64, r) #Check that we for example don't replace 9 at 1 in '997'
-            front = prime[1:pos - 1]
-            back = prime[pos + 1:end]
-            test = front * r * back
-            test = parse(Int64, test)
-            if isprime(test) && length(string(test)) == length(prime)
-                return true, test
-            end
-        else
-            continue
+function eight_prime(prime, rd)
+    count = 0
+    for digit in "012345789"
+        test = parse(Int64, replace(prime, rd => digit))
+        if test > 100000 && isprime(test)
+            count = count + 1
         end
     end
-    return false
-end
-
-function findnextprime(current)
-    current = current + 2
-    while !isprime(current)
-        current = current + 2
-    end
-    return current
+    return count == 8
 end
 
 function problem51()
-    current = 997
-    while true
-        current_amount = 1
-        used = [current]
-        for digit in string(current)
-            test = permutationprime(current, digit)
-            if test[1] && !(test[2] in used)
-                push!(used, test[2])
-                println(used)
-                current_amount = current_amount + 1
+    all = primes(100000)
+    for prime in all
+        if prime > 100000
+            s = string(prime)
+            last_digit = s[end]
+            if eight_prime(s, "0") || (last_digit != '1' && eight_prime(s, "1")) || eight_prime(s, "2")
+               return s
             end
-        end
-        if current_amount == 8
-            return current
-        else
-            current = findnextprime(current)
-        end
-    end
+       end
+   end
+   return "No return"
 end
 
-println(problem51())
+# println(problem51())
