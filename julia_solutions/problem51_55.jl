@@ -100,4 +100,19 @@ function problem52()
     end
 end
 
-println(problem52())
+#println(problem52())
+
+#Problem 53
+function problem53()
+    total = 0
+    for n = 1:100
+        for r = n:-1:1
+            if binomial(n, r) > 1 000 000
+                total += 1
+            end
+        end
+    end
+    return total
+end
+
+println(problem53())
