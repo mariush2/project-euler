@@ -15,29 +15,89 @@ number (not necessarily adjacent digits) with the same digit, is part of an eigh
 
 
 =#
-function eight_prime(prime, rd)
-    count = 0
-    for digit in "012345789"
-        test = parse(Int64, replace(prime, rd => digit))
-        if test > 100000 && isprime(test)
-            count = count + 1
-        end
+function makeNumber(t,d,c)
+    counter = 0
+    for i in 1:length(t)
+        counter *= 10
+        counter += (t[i]==11) ? d : t[i]
     end
-    return count == 8
+    counter *= 10
+    counter += c
 end
 
 function problem51()
-    all = primes(100000)
-    for prime in all
-        if prime > 100000
-            s = string(prime)
-            last_digit = s[end]
-            if eight_prime(s, "0") || (last_digit != '1' && eight_prime(s, "1")) || eight_prime(s, "2")
-               return s
+    solution = 999999
+    for a = 0:9
+        for b = 0:9
+            for c = 1:2:9
+                for i in permutations([ a b 11 11 11 ])
+                    counter = 0num
+                    for d = 0:9
+                        num = makeNumber(i,d,c)
+                        if isprime(num) && num > 100000
+                            counter += 1
+                        end
+                    end
+                    if counter >=8
+                        for d = 0:9
+                            num = makeNumber(i,d,c)
+                            if isprime(num) && num > 100000 && num < solution
+                                solution = num
+                            end
+                        end
+                    end
+                end
             end
-       end
-   end
-   return "No return"
+        end
+    end
+    solution
 end
 
-# println(problem51())
+#println(problem51())
+
+#Problem 52
+function samedigits(x, y)
+    x, y = string(x), string(y)
+    check = Dict()
+    for digit in x
+        if haskey(check, digit)
+            check[digit] += 1
+        else
+            check[digit] = 1
+        end
+    end
+    for digit in y
+        if haskey(check, digit)
+            if check[digit] > 0
+                check[digit] -= 1
+            else
+                return false
+            end
+        else
+            return false
+        end
+    end
+    return true
+end
+
+function problem52()
+    x = 1
+    while true
+        found = true
+        for i = 2:6
+            if samedigits(x, i*x)
+                continue
+            else
+                found = false
+                break
+            end
+        end
+        if found
+            return x
+        else
+            x += 1
+        end
+    end
+end
+
+println(problem52())
