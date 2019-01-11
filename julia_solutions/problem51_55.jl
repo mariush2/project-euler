@@ -252,9 +252,23 @@ function checkstraightflush!(hand)
     end
 end
 
+function notinanykind(hand, card)
+    current = parse(Int64, card[1])
+    if hand.quad == current || hand.three == current
+        return false
+    else
+        for pair in hand.pairs
+            if pair == current
+                return false
+            end
+        end
+    end
+    return true
+end
+
 function checkhigh!(hand)
     for card in hand.full_hand
-        if score[string(card[1])] > hand.high_score
+        if score[string(card[1])] > hand.high_score && notinanykind(hand, card)
             hand.high_score = score[string(card[1])]
             hand.high_card = card[1]
         end
@@ -269,7 +283,7 @@ function playeronewinner(hand1, hand2)
     elseif (hand2.straight_flush != "" && hand1.straight_flush == "") || (hand2.straight_flush != "" && hand1.straight_flush != "" && hand1.high_score < hand2.high_score)
         return false
     # Quads
-    elseif hand2.quad > hand1.quad
+    elseif hand2.quad > hand1.quad || (hand2.quad == hand1.quad && hand2.high_score > hand1.high_score)
         return false
     # Full house
     elseif (hand2.house != "" && hand1.house != "" && hand2.three > hand1.three) || (hand2.house != "" && hand1.house == "")
