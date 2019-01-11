@@ -120,7 +120,7 @@ end
 #println(problem53())
 
 #Problem 54
-f = open("pokertest.txt") # File which contain all the poker hands
+f = open("poker.txt") # File which contain all the poker hands
 lines = readlines(f)
 # Ok,
 # The way this should be done, is from top to bottom, and each hand can be a string which says which hand they currently have,
@@ -153,12 +153,17 @@ mutable struct Hand
     full_hand::Array
 end
 
-score = Dict("A" => 14, "K" => 13, "Q" => 12, "J" => 11, "T" => 10, "9" => 9, "8" => 8, "7" => 7, "6" => 6, "5" => 5, "4" => 4, "3" => 3, "2" => 2)
+score = Dict("A" => 14, "K" => 13, "Q" => 12, "J" => 11, "T" => 10)
+
+for key = 2:9
+    score[string(key)] = key
+end
+
 
 function checkflush!(hand)
-    kind = ''
+    kind = ' '
     for card in hand.full_hand
-        if kind == ''
+        if kind == ' '
             # Check if the kind is the same
             kind = card[2]
         elseif card[2] != kind
@@ -185,7 +190,6 @@ function checkroyal!(hand)
 end
 
 function checkofakind!(hand)
-    kind = ''
     for card in hand.full_hand
         amount = 0
         for card2 in hand.full_hand
@@ -194,12 +198,12 @@ function checkofakind!(hand)
             end
         end
         if amount == 4
-            hand.quad = parse(Int64, card[1])
-        elseif amount = 3
-            hand.three = parse(Int64, card[1])
-        elseif amount = 2
-            if !(card[1] in hand.pairs)
-                push!(hand.pairs, card[1])
+            hand.quad = score[string(card[1])]
+        elseif amount == 3
+            hand.three = score[string(card[1])]
+        elseif amount == 2
+            if !(score[string(card[1])] in hand.pairs)
+                push!(hand.pairs, score[string(card[1])])
             end
         end
     end
@@ -250,10 +254,46 @@ end
 
 function checkhigh!(hand)
     for card in hand.full_hand
-        if score[card[1]] > hand.high_score
-            hand.high_score = score[card[1]]
-            hand.high_card = card
+        if score[string(card[1])] > hand.high_score
+            hand.high_score = score[string(card[1])]
+            hand.high_card = card[1]
         end
+    end
+end
+
+function playeronewinner(hand1, hand2)
+    # Royal flush
+    if hand2.royal_flush
+        return false
+    # Straight flush
+    elseif (hand2.straight_flush != "" && hand1.straight_flush == "") || (hand2.straight_flush != "" && hand1.straight_flush != "" && hand1.high_score < hand2.high_score)
+        return false
+    # Quads
+    elseif hand2.quad > hand1.quad
+        return false
+    # Full house
+    elseif (hand2.house != "" && hand1.house != "" && hand2.three > hand1.three) || (hand2.house != "" && hand1.house == "")
+        return false
+    # Flush
+    elseif hand2.flush && !hand1.flush
+        return false
+    # Straight
+    elseif (hand2.straight != "" && hand1.straight == "") || (hand2.straight != "" && hand1.straight != "" && hand2.high_score > hand1.high_score)
+        return false
+    # Three of a kind
+    elseif (hand2.three > hand1.three)
+        return false
+    # Two pair
+    elseif (length(hand2.pairs) > length(hand1.pairs))
+        return false
+    # One pair
+    elseif (length(hand2.pairs) > length(hand1.pairs))
+        return false
+    # High card
+    elseif (hand2.high_score > hand1.high_score)
+        return false
+    else
+        return true
     end
 end
 
@@ -263,16 +303,17 @@ function resethand!(hand)
     hand.quad = 0
     hand.house = ""
     hand.flush = false
+    hand.flush_kind = ' '
     hand.straight = ""
     hand.three = 0
     hand.pairs = []
-    hand.high_card = ""
+    hand.high_card = ' '
     hand.high_score = 0
 end
 
 function problem54()
-    player1 = Hand(false, "", "", "", false, "", 0, "", 0, 'n', [])
-    player2 = Hand(false, "", "", "", false, "", 0, "", 0, 'n', [])
+    player1 = Hand(false, "", 0, "", false, ' ', "", 0, [], ' ', 0, [])
+    player2 = Hand(false, "", 0, "", false, ' ', "", 0, [], ' ', 0, [])
     times_one_won = 0
     for line in lines
         player1.full_hand = split(line[1:14], " ")
@@ -280,7 +321,7 @@ function problem54()
 
         resethand!(player1)
         resethand!(player2)
-        
+
         checkroyal!(player1)
         checkroyal!(player2)
 
@@ -290,9 +331,15 @@ function problem54()
         checkstraightflush!(player1)
         checkstraightflush!(player2)
 
+        checkhigh!(player1)
+        checkhigh!(player2)
 
-
+        # Have generated the hand, now we have to check who wins
+        if playeronewinner(player1, player2)
+            times_one_won += 1
+        end
     end
+    return times_one_won
 end
 
-problem54()
+println(@time problem54())
