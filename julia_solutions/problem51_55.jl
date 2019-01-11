@@ -144,23 +144,28 @@ mutable struct Hand
     quad::Int64
     house::String
     flush::Bool
+    flush_kind::Char
     straight::String
     three::Int64
     pairs::Array
     high_card::Char
+    high_score::Int64
     full_hand::Array
 end
 
+score = Dict("A" => 14, "K" => 13, "Q" => 12, "J" => 11, "T" => 10, "9" => 9, "8" => 8, "7" => 7, "6" => 6, "5" => 5, "4" => 4, "3" => 3, "2" => 2)
+
 function checkflush!(hand)
     kind = ''
-    for cards in hand.full_hand
+    for card in hand.full_hand
         if kind == ''
             # Check if the kind is the same
-            kind = cards[2]
-        elseif cards[2] != kind
+            kind = card[2]
+        elseif card[2] != kind
             hand.flush = false
         end
     end
+    hand.flush_kind = kind
     hand.flush = true
 end
 
@@ -169,8 +174,8 @@ function checkroyal!(hand)
     if hand.flush
         #Check if royal
         full = ""
-        for cards in hand.full_hand
-            full *= cards
+        for card in hand.full_hand
+            full *= card
         end
         # occursin("world", "Hello, world.") = true
         hand.royal_flush = occursin("T", full) && occursin("K", full) && occursin("J", full) && occursin("Q", full) && occursin("A", full)
@@ -181,20 +186,20 @@ end
 
 function checkofakind!(hand)
     kind = ''
-    for cards in hand
+    for card in hand.full_hand
         amount = 0
-        for cards2 in hand
-            if cards[1] == cards2[1] && cards[2] != cards2[2]
+        for card2 in hand.full_hand
+            if card[1] == card2[1] && card[2] != card2[2]
                 amount += 1
             end
         end
         if amount == 4
-            hand.quad = parse(Int64, cards[1])
+            hand.quad = parse(Int64, card[1])
         elseif amount = 3
-            hand.three = parse(Int64, cards[1])
+            hand.three = parse(Int64, card[1])
         elseif amount = 2
-            if !(cards[1] in hand.pairs)
-                push!(hand.pairs, cards[1])
+            if !(card[1] in hand.pairs)
+                push!(hand.pairs, card[1])
             end
         end
     end
@@ -210,7 +215,49 @@ function checkhouse!(hand)
     end
 end
 
-function resethand(hand)
+function checkstraight!(hand)
+    allowed = ["23456", "34567", "45678", "56789", "6789T", "789TJ", "89TJQ", "9TJQK", "TJQKA"]
+    sequence = ""
+    for cards in hand.full_hand
+        sequence *= cards[1]
+    end
+    # Now the sequence var contains the cards we have in the current hand
+    # Now lets check if it's a straight
+    for straight in allowed
+        success = true
+        for letter in sequence
+            if !(occursin(letter, straight))
+                success = false
+                break
+            end
+        end
+        if success
+            hand.straight = straight
+            break
+        end
+    end
+end
+
+function checkstraightflush!(hand)
+    # We have called checkflush! already in the royal flush check
+    checkstraight!(hand)
+    if hand.flush
+        if hand.straight != ""
+            hand.straight_flush = hand.straight * " " * hand.flush_kind
+        end
+    end
+end
+
+function checkhigh!(hand)
+    for card in hand.full_hand
+        if score[card[1]] > hand.high_score
+            hand.high_score = score[card[1]]
+            hand.high_card = card
+        end
+    end
+end
+
+function resethand!(hand)
     hand.royal_flush = false
     hand.straight_flush = ""
     hand.quad = 0
@@ -220,7 +267,9 @@ function resethand(hand)
     hand.three = 0
     hand.pairs = []
     hand.high_card = ""
+    hand.high_score = 0
 end
+
 function problem54()
     player1 = Hand(false, "", "", "", false, "", 0, "", 0, 'n', [])
     player2 = Hand(false, "", "", "", false, "", 0, "", 0, 'n', [])
@@ -228,11 +277,20 @@ function problem54()
     for line in lines
         player1.full_hand = split(line[1:14], " ")
         player2.full_hand = split(line[16:end], " ")
+
+        resethand!(player1)
+        resethand!(player2)
+        
         checkroyal!(player1)
         checkroyal!(player2)
 
-        checkquads!(player1)
-        checkquads!(player2)
+        checkhouse!(player1)
+        checkhouse!(player2)
+
+        checkstraightflush!(player1)
+        checkstraightflush!(player2)
+
+
 
     end
 end
