@@ -253,7 +253,7 @@ function checkstraightflush!(hand)
 end
 
 function notinanykind(hand, card)
-    current = parse(Int64, card[1])
+    current = score[string(card[1])]
     if hand.quad == current || hand.three == current
         return false
     else
