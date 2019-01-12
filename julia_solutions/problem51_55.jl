@@ -151,6 +151,7 @@ mutable struct Hand
     high_card::Char
     high_score::Int64
     full_hand::Array
+
 end
 
 score = Dict("A" => 14, "K" => 13, "Q" => 12, "J" => 11, "T" => 10)
@@ -159,6 +160,17 @@ for key = 2:9
     score[string(key)] = key
 end
 
+function tostring(hand)
+    println("Royal flush: ", hand.royal_flush)
+    println("Straight flush: ", hand.straight_flush)
+    println("Quads: ", hand.quad)
+    println("Full House: ", hand.house)
+    println("Flush: ", hand.flush, " kind: ", hand.flush_kind)
+    println("Straight: ", hand.straight)
+    println("Threes: ", hand.three)
+    println("Pairs: ", hand.pairs)
+    println("High card: ", hand.high_card, " score: ", hand.high_score)
+end
 
 function checkflush!(hand)
     kind = ' '
@@ -168,6 +180,8 @@ function checkflush!(hand)
             kind = card[2]
         elseif card[2] != kind
             hand.flush = false
+            hand.flush_kind = ' '
+            return
         end
     end
     hand.flush_kind = kind
@@ -180,7 +194,7 @@ function checkroyal!(hand)
         #Check if royal
         full = ""
         for card in hand.full_hand
-            full *= card
+            full = full * card
         end
         # occursin("world", "Hello, world.") = true
         hand.royal_flush = occursin("T", full) && occursin("K", full) && occursin("J", full) && occursin("Q", full) && occursin("A", full)
@@ -191,20 +205,18 @@ end
 
 function checkofakind!(hand)
     for card in hand.full_hand
-        amount = 0
+        amount = 1
         for card2 in hand.full_hand
             if card[1] == card2[1] && card[2] != card2[2]
-                amount += 1
+                amount = amount + 1
             end
         end
         if amount == 4
             hand.quad = score[string(card[1])]
         elseif amount == 3
             hand.three = score[string(card[1])]
-        elseif amount == 2
-            if !(score[string(card[1])] in hand.pairs)
-                push!(hand.pairs, score[string(card[1])])
-            end
+        elseif amount == 2 && !(score[string(card[1])] in hand.pairs)
+            push!(hand.pairs, score[string(card[1])])
         end
     end
 end
@@ -223,7 +235,7 @@ function checkstraight!(hand)
     allowed = ["23456", "34567", "45678", "56789", "6789T", "789TJ", "89TJQ", "9TJQK", "TJQKA"]
     sequence = ""
     for cards in hand.full_hand
-        sequence *= cards[1]
+        sequence = sequence * cards[1]
     end
     # Now the sequence var contains the cards we have in the current hand
     # Now lets check if it's a straight
@@ -277,7 +289,7 @@ end
 
 function playeronewinner(hand1, hand2)
     # Royal flush
-    if hand2.royal_flush
+    if hand2.royal_flush && !hand1.royal_flush
         return false
     # Straight flush
     elseif (hand2.straight_flush != "" && hand1.straight_flush == "") || (hand2.straight_flush != "" && hand1.straight_flush != "" && hand1.high_score < hand2.high_score)
@@ -297,14 +309,12 @@ function playeronewinner(hand1, hand2)
     # Three of a kind
     elseif (hand2.three > hand1.three)
         return false
-    # Two pair
-    elseif (length(hand2.pairs) > length(hand1.pairs))
-        return false
-    # One pair
-    elseif (length(hand2.pairs) > length(hand1.pairs))
+    # Two pair and one pair
+    elseif (length(hand2.pairs) > length(hand1.pairs)) && sum(hand2.pairs) > sum(hand1.pairs)
         return false
     # High card
     elseif (hand2.high_score > hand1.high_score)
+        println("lol")
         return false
     else
         return true
@@ -320,18 +330,21 @@ function resethand!(hand)
     hand.flush_kind = ' '
     hand.straight = ""
     hand.three = 0
-    hand.pairs = []
+    hand.pairs = [0]
     hand.high_card = ' '
     hand.high_score = 0
 end
 
 function problem54()
-    player1 = Hand(false, "", 0, "", false, ' ', "", 0, [], ' ', 0, [])
-    player2 = Hand(false, "", 0, "", false, ' ', "", 0, [], ' ', 0, [])
+    player1 = Hand(false, "", 0, "", false, ' ', "", 0, [0], ' ', 0, [])
+    player2 = Hand(false, "", 0, "", false, ' ', "", 0, [0], ' ', 0, [])
     times_one_won = 0
     for line in lines
         player1.full_hand = split(line[1:14], " ")
         player2.full_hand = split(line[16:end], " ")
+
+        println("--------------------------------")
+        println(line[1:14], "   ", line[16:end])
 
         resethand!(player1)
         resethand!(player2)
@@ -349,9 +362,19 @@ function problem54()
         checkhigh!(player2)
 
         # Have generated the hand, now we have to check who wins
+        println("\n")
         if playeronewinner(player1, player2)
             times_one_won += 1
+            println("Player 1 won!")
+        else
+            println("Player 2 won!")
+            println("\nPlayer1")
+            tostring(player1)
+            println("\nPlayer2")
+            tostring(player2)
         end
+        println("--------------------------------")
+        println("\n\n")
     end
     return times_one_won
 end
