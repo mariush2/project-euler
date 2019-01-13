@@ -120,7 +120,7 @@ end
 #println(problem53())
 
 #Problem 54
-f = open("poker.txt") # File which contain all the poker hands
+f = open("pokertest.txt") # File which contain all the poker hands
 lines = readlines(f)
 # Ok,
 # The way this should be done, is from top to bottom, and each hand can be a string which says which hand they currently have,
@@ -223,7 +223,7 @@ end
 
 function checkhouse!(hand)
     checkofakind!(hand)
-    if hand.three != 0 && hand.pairs != []
+    if hand.three != 0 && hand.pairs != [0]
         # House
         # Pattern: three 'space' pair
         # Remember we can only have 1 pair, because we have 5 cards
@@ -233,21 +233,15 @@ end
 
 function checkstraight!(hand)
     allowed = ["23456", "34567", "45678", "56789", "6789T", "789TJ", "89TJQ", "9TJQK", "TJQKA"]
-    sequence = ""
-    for cards in hand.full_hand
-        sequence = sequence * cards[1]
-    end
-    # Now the sequence var contains the cards we have in the current hand
-    # Now lets check if it's a straight
-    for straight in allowed
-        success = true
-        for letter in sequence
-            if !(occursin(letter, straight))
-                success = false
-                break
-            end
+    for i = 1:length(hand.full_hand) - 1
+        if score[string(hand.full_hand[i + 1][1])] != score[string(hand.full_hand[i][1])] + 1
+            return
         end
-        if success
+    end
+    # Find which straight it is
+    for straight in allowed
+        if straight[5] == hand.high_card
+            # Found the correct straight
             hand.straight = straight
             break
         end
@@ -287,37 +281,49 @@ function checkhigh!(hand)
     end
 end
 
+
+
 function playeronewinner(hand1, hand2)
+    previous = Dict()
+
+    previous["straight_flush"] = !hand2.royal_flush
+    previous["quads"] = ((hand1.straight_flush != "" && hand2.straight_flush == "") || (hand1.straight_flush != "" && hand2.straight_flush != "" && hand2.high_score < hand1.high_score)) || previous["straight_flush"]
+    previous["house"] = (hand1.quad > hand2.quad || (hand1.quad == hand2.quad && hand1.high_score > hand2.high_score)) || previous["quads"]
+    previous["flush"] = ((hand1.house != "" && hand2.house != "" && hand1.three > hand2.three) || (hand1.house != "" && hand2.house == "")) || previous["house"]
+    previous["straight"] = (hand1.flush && !hand2.flush) || previous["flush"]
+    previous["threes"] = ((hand1.straight != "" && hand2.straight == "") || (hand1.straight != "" && hand2.straight != "" && hand1.high_score > hand2.high_score)) || previous["straight"]
+    previous["pairs"] = (hand1.three > hand2.three) || previous["threes"]
+    previous["high"] = ((length(hand1.pairs) > length(hand2.pairs)) && sum(hand1.pairs) > sum(hand2.pairs)) || previous["pairs"]
+
     # Royal flush
-    if hand2.royal_flush && !hand1.royal_flush
-        return false
-    # Straight flush
-    elseif (hand2.straight_flush != "" && hand1.straight_flush == "") || (hand2.straight_flush != "" && hand1.straight_flush != "" && hand1.high_score < hand2.high_score)
-        return false
-    # Quads
-    elseif hand2.quad > hand1.quad || (hand2.quad == hand1.quad && hand2.high_score > hand1.high_score)
-        return false
-    # Full house
-    elseif (hand2.house != "" && hand1.house != "" && hand2.three > hand1.three) || (hand2.house != "" && hand1.house == "")
-        return false
-    # Flush
-    elseif hand2.flush && !hand1.flush
-        return false
-    # Straight
-    elseif (hand2.straight != "" && hand1.straight == "") || (hand2.straight != "" && hand1.straight != "" && hand2.high_score > hand1.high_score)
-        return false
-    # Three of a kind
-    elseif (hand2.three > hand1.three)
-        return false
-    # Two pair and one pair
-    elseif (length(hand2.pairs) > length(hand1.pairs)) && sum(hand2.pairs) > sum(hand1.pairs)
-        return false
-    # High card
-    elseif (hand2.high_score > hand1.high_score)
-        println("lol")
-        return false
-    else
+    if hand1.royal_flush
         return true
+    # Straight flush
+    elseif previous["straight_flush"] && ((hand1.straight_flush != "" && hand2.straight_flush == "") || (hand1.straight_flush != "" && hand2.straight_flush != "" && hand2.high_score < hand1.high_score))
+        return true
+    # Quads
+    elseif previous["quads"] && (hand1.quad > hand2.quad || (hand1.quad == hand2.quad && hand1.high_score > hand2.high_score))
+        return true
+    # Full house
+    elseif previous["house"] && ((hand1.house != "" && hand2.house != "" && hand1.three > hand2.three) || (hand1.house != "" && hand2.house == ""))
+        return true
+    # Flush
+    elseif previous["flush"] && (hand1.flush && !hand2.flush)
+        return true
+    # Straight
+    elseif previous["straight"] && ((hand1.straight != "" && hand2.straight == "") || (hand1.straight != "" && hand2.straight != "" && hand1.high_score > hand2.high_score))
+        return true
+    # Three of a kind
+    elseif previous["threes"] && (hand1.three > hand2.three)
+        return true
+    # Two pair and one pair
+    elseif previous["pairs"] && ((length(hand1.pairs) > length(hand2.pairs)) && sum(hand1.pairs) > sum(hand2.pairs))
+        return true
+    # High card
+    elseif previous["high"] && (hand1.high_score > hand2.high_score)
+        return true
+    else
+        return false
     end
 end
 
@@ -335,6 +341,21 @@ function resethand!(hand)
     hand.high_score = 0
 end
 
+function sorthand!(hand)
+    swapped = true
+    while swapped
+        swapped = false
+        for i = 2:length(hand.full_hand)
+            if score[string(hand.full_hand[i - 1][1])] > score[string(hand.full_hand[i][1])]
+                temp = hand.full_hand[i]
+                hand.full_hand[i] = hand.full_hand[i - 1]
+                hand.full_hand[i - 1] = temp
+                swapped = true
+            end
+        end
+    end
+end
+
 function problem54()
     player1 = Hand(false, "", 0, "", false, ' ', "", 0, [0], ' ', 0, [])
     player2 = Hand(false, "", 0, "", false, ' ', "", 0, [0], ' ', 0, [])
@@ -348,6 +369,9 @@ function problem54()
 
         resethand!(player1)
         resethand!(player2)
+
+        sorthand!(player1)
+        sorthand!(player2)
 
         checkroyal!(player1)
         checkroyal!(player2)
@@ -368,14 +392,15 @@ function problem54()
             println("Player 1 won!")
         else
             println("Player 2 won!")
-            println("\nPlayer1")
-            tostring(player1)
-            println("\nPlayer2")
-            tostring(player2)
         end
+        println("\nPlayer1")
+        tostring(player1)
+        println("\nPlayer2")
+        tostring(player2)
         println("--------------------------------")
         println("\n\n")
     end
+    close(f)
     return times_one_won
 end
 
