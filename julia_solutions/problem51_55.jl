@@ -281,50 +281,47 @@ function checkhigh!(hand)
     end
 end
 
-
+#=
+    High Card: Highest value card.
+    One Pair: Two cards of the same value.
+    Two Pairs: Two different pairs.
+    Three of a Kind: Three cards of the same value.
+    Straight: All cards are consecutive values.
+    Flush: All cards of the same suit.
+    Full House: Three of a kind and a pair.
+    Four of a Kind: Four cards of the same value.
+    Straight Flush: All cards are consecutive values of same suit.
+    Royal Flush: Ten, Jack, Queen, King, Ace, in same suit.
+=#
 
 function playeronewinner(hand1, hand2)
-    previous = Dict()
 
-    previous["straight_flush"] = !hand2.royal_flush
-    previous["quads"] = ((hand1.straight_flush != "" && hand2.straight_flush == "") || (hand1.straight_flush != "" && hand2.straight_flush != "" && hand2.high_score < hand1.high_score)) || previous["straight_flush"]
-    previous["house"] = (hand1.quad > hand2.quad || (hand1.quad == hand2.quad && hand1.high_score > hand2.high_score)) || previous["quads"]
-    previous["flush"] = ((hand1.house != "" && hand2.house != "" && hand1.three > hand2.three) || (hand1.house != "" && hand2.house == "")) || previous["house"]
-    previous["straight"] = (hand1.flush && !hand2.flush) || previous["flush"]
-    previous["threes"] = ((hand1.straight != "" && hand2.straight == "") || (hand1.straight != "" && hand2.straight != "" && hand1.high_score > hand2.high_score)) || previous["straight"]
-    previous["pairs"] = (hand1.three > hand2.three) || previous["threes"]
-    previous["high"] = ((length(hand1.pairs) > length(hand2.pairs)) && sum(hand1.pairs) > sum(hand2.pairs)) || previous["pairs"]
-
-    # Royal flush
-    if hand1.royal_flush
-        return true
-    # Straight flush
-    elseif previous["straight_flush"] && ((hand1.straight_flush != "" && hand2.straight_flush == "") || (hand1.straight_flush != "" && hand2.straight_flush != "" && hand2.high_score < hand1.high_score))
-        return true
-    # Quads
-    elseif previous["quads"] && (hand1.quad > hand2.quad || (hand1.quad == hand2.quad && hand1.high_score > hand2.high_score))
-        return true
-    # Full house
-    elseif previous["house"] && ((hand1.house != "" && hand2.house != "" && hand1.three > hand2.three) || (hand1.house != "" && hand2.house == ""))
-        return true
-    # Flush
-    elseif previous["flush"] && (hand1.flush && !hand2.flush)
-        return true
-    # Straight
-    elseif previous["straight"] && ((hand1.straight != "" && hand2.straight == "") || (hand1.straight != "" && hand2.straight != "" && hand1.high_score > hand2.high_score))
-        return true
-    # Three of a kind
-    elseif previous["threes"] && (hand1.three > hand2.three)
-        return true
-    # Two pair and one pair
-    elseif previous["pairs"] && ((length(hand1.pairs) > length(hand2.pairs)) && sum(hand1.pairs) > sum(hand2.pairs))
-        return true
-    # High card
-    elseif previous["high"] && (hand1.high_score > hand2.high_score)
-        return true
-    else
+    if hand2.royal_flush
+        # Player 2 has royal flush, check if Player 1 beats it
         return false
-    end
+    elseif hand2.straight_flush != ""
+        # Player 2 has straight flush, check if Player 1 beats it
+        if hand1.royal_flush || (hand1.high_score > hand2.high_score)
+            return true
+        else
+            return false
+        end
+    elseif hand2.quad != 0
+        # Player 2 has quads, check if player 1 beats
+        if hand1.royal_flush || (hand1.straight_flush != "") || hand1.quad > hand2.quad
+            return true
+        else
+            return false
+        end
+    elseif hand2.house != ""
+        # Player 2 has full house, check if player 1 beats it
+        if hand1.royal_flush || (hand1.straight_flush != "") || hand1.quad > hand2.quad || (hand1.house != "" && hand1.high_score > hand2.high_score)
+            return true
+        else
+            return false
+        end
+    elseif
+        # TODO: Fill in all the possibilities!
 end
 
 function resethand!(hand)
