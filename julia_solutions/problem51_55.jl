@@ -120,8 +120,9 @@ end
 #println(problem53())
 
 #Problem 54
-f = open("pokertest.txt") # File which contain all the poker hands
+f = open("poker.txt") # File which contain all the poker hands
 lines = readlines(f)
+
 # Ok,
 # The way this should be done, is from top to bottom, and each hand can be a string which says which hand they currently have,
 # After this we have to check which of the hands win, say if we have both players with two pair, which of the two have the better pairs?
@@ -140,12 +141,12 @@ lines = readlines(f)
 =#
 mutable struct Hand
     royal_flush::Bool
-    straight_flush::String
+    straight_flush::Bool
     quad::Int64
-    house::String
+    house::Bool
     flush::Bool
     flush_kind::Char
-    straight::String
+    straight::Bool
     three::Int64
     pairs::Array
     high_card::Char
@@ -194,10 +195,14 @@ function checkroyal!(hand)
         #Check if royal
         full = ""
         for card in hand.full_hand
-            full = full * card
+            full = full * card[1]
         end
+        test = "TJQKA"
         # occursin("world", "Hello, world.") = true
-        hand.royal_flush = occursin("T", full) && occursin("K", full) && occursin("J", full) && occursin("Q", full) && occursin("A", full)
+        if full == test
+            println("ROYAL FLUSH!!!!")
+            hand.royal_flush = true
+        end
     else
         hand.royal_flush = false
     end
@@ -227,7 +232,7 @@ function checkhouse!(hand)
         # House
         # Pattern: three 'space' pair
         # Remember we can only have 1 pair, because we have 5 cards
-        hand.house = string(hand.three) * " " * string(hand.pairs[1])
+        hand.house = true
     end
 end
 
@@ -238,23 +243,14 @@ function checkstraight!(hand)
             return
         end
     end
-    # Find which straight it is
-    for straight in allowed
-        if straight[5] == hand.high_card
-            # Found the correct straight
-            hand.straight = straight
-            break
-        end
-    end
+    hand.straight = true
 end
 
 function checkstraightflush!(hand)
     # We have called checkflush! already in the royal flush check
     checkstraight!(hand)
-    if hand.flush
-        if hand.straight != ""
-            hand.straight_flush = hand.straight * " " * hand.flush_kind
-        end
+    if hand.flush && hand.straight
+       hand.straight_flush = true
     end
 end
 
@@ -281,57 +277,86 @@ function checkhigh!(hand)
     end
 end
 
-#=
-    High Card: Highest value card.
-    One Pair: Two cards of the same value.
-    Two Pairs: Two different pairs.
-    Three of a Kind: Three cards of the same value.
-    Straight: All cards are consecutive values.
-    Flush: All cards of the same suit.
-    Full House: Three of a kind and a pair.
-    Four of a Kind: Four cards of the same value.
-    Straight Flush: All cards are consecutive values of same suit.
-    Royal Flush: Ten, Jack, Queen, King, Ace, in same suit.
-=#
-
 function playeronewinner(hand1, hand2)
-
     if hand2.royal_flush
-        # Player 2 has royal flush, check if Player 1 beats it
+        # Player 2 has royal flush, player 1 loses
+        println("Player 2 has a royal flush")
         return false
-    elseif hand2.straight_flush != ""
+    elseif hand2.straight_flush
         # Player 2 has straight flush, check if Player 1 beats it
-        if hand1.royal_flush || (hand1.high_score > hand2.high_score)
+        println("Player 2 has a straight flush")
+        if hand1.royal_flush || (hand1.straight_flush && hand1.high_score > hand2.high_score)
             return true
         else
             return false
         end
     elseif hand2.quad != 0
         # Player 2 has quads, check if player 1 beats
-        if hand1.royal_flush || (hand1.straight_flush != "") || hand1.quad > hand2.quad
+        println("Player 2 has quads")
+        if hand1.royal_flush || hand1.straight_flush || hand1.quad > hand2.quad
             return true
         else
             return false
         end
-    elseif hand2.house != ""
+    elseif hand2.house
         # Player 2 has full house, check if player 1 beats it
-        if hand1.royal_flush || (hand1.straight_flush != "") || hand1.quad > hand2.quad || (hand1.house != "" && hand1.high_score > hand2.high_score)
+        println("Player 2 has a full house")
+        if hand1.royal_flush || hand1.straight_flush || hand1.quad != 0 || (hand1.house && hand1.three > hand2.three) || (hand1.house && sum(hand1.pairs) > sum(hand2.pairs) && hand1.three == hand2.three)
             return true
         else
             return false
         end
-    elseif
-        # TODO: Fill in all the possibilities!
+    elseif hand2.flush
+        # Player 2 has flush, check if player 1 beats it
+        println("Player 2 has a flush")
+        if hand1.royal_flush || hand1.straight_flush || hand1.quad != 0 || hand1.house
+            return true
+        else
+            return false
+        end
+    elseif hand2.straight
+        # Player 2 has a straight, check if player 1 beats it
+        println("Player 2 has a straight")
+        if hand1.royal_flush || hand1.straight_flush || hand1.quad != 0 || hand1.house || hand1.flush ||(hand1.straight && hand1.high_score > hand2.high_score)
+            return true
+        else
+            return false
+        end
+    elseif hand2.three > 0
+        # Player 2 has pair of threes, check if player 1 beats it
+        println("Player 2 has a threes")
+        if hand1.royal_flush || (hand1.straight_flush) || hand1.quad > hand2.quad || (hand1.house) || hand1.flush || (hand1.straight) || (hand1.three > hand2.three)
+            return true
+        else
+            return false
+        end
+    elseif hand2.pairs != [0]
+        # Player 2 has one or more pairs, check if player 1 beats it
+        println("Player 2 has one or more pairs")
+        if hand1.royal_flush || hand1.straight_flush || hand1.quad != 0 || hand1.house || hand1.flush || hand1.straight || (hand1.three != 0) || length(hand1.pairs) > length(hand2.pairs) || sum(hand1.pairs) > sum(hand2.pairs) || (hand1.pairs == hand2.pairs && hand1.high_score > hand2.high_score)
+            return true
+        else
+            return false
+        end
+    else
+        # Player 2 has high card, check if player 1 beats it
+        println("Player 2 has high card")
+        if hand1.royal_flush || hand1.straight_flush || hand1.quad != 0 || hand1.house || hand1.flush || hand1.straight || hand1.three != 0 || hand1.pairs != [0] || hand1.high_score > hand2.high_score
+            return true
+        else
+            return false
+        end
+    end
 end
 
 function resethand!(hand)
     hand.royal_flush = false
-    hand.straight_flush = ""
+    hand.straight_flush = false
     hand.quad = 0
-    hand.house = ""
+    hand.house = false
     hand.flush = false
     hand.flush_kind = ' '
-    hand.straight = ""
+    hand.straight = false
     hand.three = 0
     hand.pairs = [0]
     hand.high_card = ' '
@@ -354,8 +379,8 @@ function sorthand!(hand)
 end
 
 function problem54()
-    player1 = Hand(false, "", 0, "", false, ' ', "", 0, [0], ' ', 0, [])
-    player2 = Hand(false, "", 0, "", false, ' ', "", 0, [0], ' ', 0, [])
+    player1 = Hand(false, false, 0, false, false, ' ', false, 0, [0], ' ', 0, [])
+    player2 = Hand(false, false, 0, false, false, ' ', false, 0, [0], ' ', 0, [])
     times_one_won = 0
     for line in lines
         player1.full_hand = split(line[1:14], " ")
