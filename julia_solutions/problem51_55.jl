@@ -333,7 +333,7 @@ function playeronewinner(hand1, hand2)
     elseif hand2.pairs != [0]
         # Player 2 has one or more pairs, check if player 1 beats it
         println("Player 2 has one or more pairs")
-        if hand1.royal_flush || hand1.straight_flush || hand1.quad != 0 || hand1.house || hand1.flush || hand1.straight || (hand1.three != 0) || length(hand1.pairs) > length(hand2.pairs) || sum(hand1.pairs) > sum(hand2.pairs) || (hand1.pairs == hand2.pairs && hand1.high_score > hand2.high_score)
+        if hand1.royal_flush || hand1.straight_flush || hand1.quad != 0 || hand1.house || hand1.flush || hand1.straight || (hand1.three != 0) || length(hand1.pairs) > length(hand2.pairs) || maximum(hand1.pairs) > maximum(hand2.pairs) && length(hand1.pairs) == length(hand2.pairs) || (hand1.pairs == hand2.pairs && hand1.high_score > hand2.high_score)
             return true
         else
             return false
