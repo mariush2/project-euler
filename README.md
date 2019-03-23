@@ -1,6 +1,6 @@
 # Project-euler
 
-This repo contains my (shitty) solutions to the project-euler problems.
+This repo contain my (shitty) solutions to the project-euler problems.
 
 I started doing them in Python, but moved on to using Julia.
 
